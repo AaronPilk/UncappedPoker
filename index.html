@@ -144,7 +144,11 @@
   .chip::after{content:"";position:absolute;inset:9px;border-radius:50%;border:2px solid rgba(201,168,106,.32)}
   .hero-fx.in .chip{opacity:.92;scale:1}
   @media(max-width:640px){
-    .fcard{box-shadow:0 20px 38px rgba(0,0,0,.55)}
+    /* keep the floating cards/chips as faint background texture so they never block the copy */
+    .fcard{width:clamp(48px,15vw,68px);box-shadow:0 16px 30px rgba(0,0,0,.5)}
+    .chip{width:clamp(40px,11vw,58px)}
+    .hero-fx.in .fcard{opacity:.34}
+    .hero-fx.in .chip{opacity:.32}
     .hero-grid{height:38vh}
   }
 
