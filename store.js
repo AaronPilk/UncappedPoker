@@ -119,8 +119,31 @@
   .uc-sa-group{margin-top:46px}
   .uc-sa-group > .g-title{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);margin-bottom:20px;display:flex;align-items:baseline;gap:12px}
   .uc-sa-group > .g-title span{font-size:12px;color:var(--ink-dim);font-family:'Inter',sans-serif;letter-spacing:.1em}
-  .uc-sa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,2vw,24px)}
+  .uc-sa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(14px,2vw,26px)}
   @media(max-width:900px){.uc-sa-grid{grid-template-columns:repeat(2,1fr)}}
+  /* shop page chrome */
+  .uc-shopbar{position:sticky;top:0;z-index:6;display:flex;align-items:center;justify-content:space-between;
+    padding:15px 22px;background:rgba(8,9,10,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  .uc-sb-home,.uc-sb-cart{background:none;border:1px solid var(--line);color:var(--ink);border-radius:30px;padding:9px 16px;
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:.3s var(--ease)}
+  .uc-sb-home:hover,.uc-sb-cart:hover{border-color:var(--gold-bright);color:var(--gold-bright)}
+  .uc-sb-logo{font-family:'Playfair Display',serif;font-weight:800;letter-spacing:.3em;font-size:15px;color:var(--ink)}
+  .uc-sb-logo b{color:var(--gold-bright)}
+  .uc-shop-wrap{max-width:1200px;margin:0 auto;padding:clamp(34px,5vw,56px) 22px 90px}
+  .uc-shop-hero{text-align:center;margin-bottom:30px}
+  .uc-shop-hero .lbl{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold)}
+  .uc-shop-hero h1{font-family:'Playfair Display',serif;font-size:clamp(40px,6vw,82px);line-height:1;margin:12px 0 14px}
+  .uc-shop-hero p{color:var(--ink-dim);font-size:14px}
+  .uc-shop-hero p span{color:var(--gold)}
+  .uc-filters{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    border-block:1px solid var(--line);padding:16px 0;margin-bottom:30px}
+  .uc-fpills{display:flex;gap:8px;flex-wrap:wrap}
+  .uc-fpill{background:none;border:1px solid var(--line);color:var(--ink-dim);border-radius:30px;padding:9px 18px;
+    font-size:11px;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:.3s var(--ease)}
+  .uc-fpill:hover{color:var(--ink);border-color:var(--gold)}
+  .uc-fpill.on{background:var(--gold-bright);color:#000;border-color:var(--gold-bright)}
+  .uc-sort{background:var(--bg-2);border:1px solid var(--line);color:var(--ink);border-radius:30px;padding:11px 16px;font-size:12px;letter-spacing:.04em;cursor:pointer}
+  @media(max-width:560px){.uc-filters{flex-direction:column;align-items:stretch}.uc-sort{width:100%}}
   body.uc-shopall .uc-modal.shopall{opacity:1;pointer-events:auto}
   `;
   document.head.appendChild(el('style', null, css));
@@ -140,7 +163,7 @@
     '</aside>' +
     '<div class="uc-modal qa"><div class="uc-card" id="ucQa"></div></div>' +
     '<div class="uc-modal pdp"><button class="uc-back" data-uc-close>← Back</button><div id="ucPdp"></div></div>' +
-    '<div class="uc-modal shopall"><button class="uc-back" data-uc-close>← Back</button><div id="ucShopAll"></div></div>' +
+    '<div class="uc-modal shopall"><div id="ucShopAll"></div></div>' +
     '<button class="uc-fab" id="ucFab" aria-label="Open cart">BAG<span class="b" id="ucFabB">0</span></button>';
   document.body.appendChild(root);
 
@@ -184,7 +207,7 @@
       '<div class="ph">' + (p.tag ? '<span class="tag">' + p.tag + '</span>' : '') +
         (mto(p) ? '<span class="uc-mto">' + FUL.badge + '</span>' : '') +
         '<img src="' + p.image + '" alt="' + p.title + ' — Uncapped Poker" loading="lazy" width="900" height="1080"></div>' +
-      '<div class="meta"><div><h3>' + p.title + '</h3><div class="cat">' + p.category + ' · ' + p.colorway + '</div></div>' +
+      '<div class="meta"><h3>' + p.title + '</h3><div class="cat">' + p.category + ' · ' + p.colorway + '</div>' +
         '<div class="price">' + money(p.price) + '</div></div>' +
       '<div class="add" data-h data-add="' + p.handle + '">' + (mto(p) ? FUL.cta : 'Add to Cart') + '</div></div>';
   }
@@ -287,16 +310,49 @@
     document.body.classList.add('uc-pdp');
     $pdp.parentElement.scrollTop = 0;
   }
+  var saFilter = 'All', saSort = 'featured';
+  function shopProducts() {
+    var list = ALL.slice();
+    if (saFilter !== 'All') list = list.filter(function (p) { return p.collection === saFilter; });
+    if (saSort === 'price-asc') list.sort(function (a, b) { return a.price - b.price; });
+    else if (saSort === 'price-desc') list.sort(function (a, b) { return b.price - a.price; });
+    else { var order = {}; FEAT.forEach(function (h, i) { order[h] = i; }); list.sort(function (a, b) { var ai = (order[a.handle] != null ? order[a.handle] : 99), bi = (order[b.handle] != null ? order[b.handle] : 99); return ai - bi; }); }
+    return list;
+  }
+  function renderShopGrid() {
+    var list = shopProducts(), g = document.getElementById('ucSaGrid');
+    if (!g) return;
+    g.innerHTML = list.map(card).join('');
+    g.querySelectorAll('.card').forEach(function (c) { c.classList.add('in'); });
+    var cnt = document.getElementById('ucSaCount'); if (cnt) cnt.textContent = list.length + (list.length === 1 ? ' piece' : ' pieces');
+  }
   function openShopAll() {
-    var cols = (window.UNCAPPED && window.UNCAPPED.collections) || ['Shirts', 'Hats', 'Mystery Box'];
-    var groups = cols.map(function (coll) {
-      var items = ALL.filter(function (p) { return p.collection === coll; });
-      if (!items.length) return '';
-      return '<div class="uc-sa-group"><div class="g-title">' + coll + ' <span>' + items.length + '</span></div>' +
-        '<div class="uc-sa-grid">' + items.map(card).join('') + '</div></div>';
-    }).join('');
-    $shopAll.innerHTML = '<div class="uc-sa-wrap"><div class="uc-sa-head"><div class="lbl">The Full Spread</div><h2>Every Design</h2></div>' + groups + '</div>';
-    $shopAll.querySelectorAll('.card').forEach(function (c) { c.classList.add('in'); }); // not scroll-observed here
+    var cols = ['All'].concat((window.UNCAPPED && window.UNCAPPED.collections) || ['Shirts', 'Hats', 'Mystery Box']);
+    $shopAll.innerHTML =
+      '<div class="uc-shopbar"><button class="uc-sb-home" data-uc-close>← Home</button>' +
+        '<div class="uc-sb-logo">UNCAPP<b>E</b>D</div>' +
+        '<button class="uc-sb-cart" id="ucSbCart">Bag · ' + count() + '</button></div>' +
+      '<div class="uc-shop-wrap">' +
+        '<div class="uc-shop-hero"><div class="lbl">Shop All</div><h1>The Full Spread</h1>' +
+          '<p>Every Uncapped design — printed to order, built to last. · <span id="ucSaCount"></span></p></div>' +
+        '<div class="uc-filters"><div class="uc-fpills">' +
+          cols.map(function (c) { return '<button class="uc-fpill' + (c === saFilter ? ' on' : '') + '" data-f="' + c + '">' + c + '</button>'; }).join('') +
+        '</div><select class="uc-sort" id="ucSort">' +
+          '<option value="featured">Featured</option><option value="price-asc">Price: Low to High</option><option value="price-desc">Price: High to Low</option>' +
+        '</select></div>' +
+        '<div class="uc-sa-grid" id="ucSaGrid"></div>' +
+      '</div>';
+    $shopAll.querySelectorAll('.uc-fpill').forEach(function (b) {
+      b.addEventListener('click', function () {
+        saFilter = this.getAttribute('data-f');
+        $shopAll.querySelectorAll('.uc-fpill').forEach(function (x) { x.classList.remove('on'); });
+        this.classList.add('on'); renderShopGrid();
+      });
+    });
+    document.getElementById('ucSort').value = saSort;
+    document.getElementById('ucSort').addEventListener('change', function () { saSort = this.value; renderShopGrid(); });
+    document.getElementById('ucSbCart').addEventListener('click', openCart);
+    renderShopGrid();
     document.body.classList.add('uc-open', 'uc-shopall');
     $shopAll.parentElement.scrollTop = 0;
   }
@@ -340,6 +396,7 @@
     var n = count();
     document.querySelectorAll('.nav-cart').forEach(function (a) { a.textContent = 'Cart · ' + n; });
     $fabB.textContent = n;
+    var sb = document.getElementById('ucSbCart'); if (sb) sb.textContent = 'Bag · ' + n;
   }
   /* cart openers */
   document.querySelectorAll('.nav-cart').forEach(function (a) { a.addEventListener('click', function (e) { e.preventDefault(); openCart(); }); });
