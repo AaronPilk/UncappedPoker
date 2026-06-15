@@ -113,6 +113,41 @@
   .suit.s2{animation-duration:11s}.suit.s3{animation-duration:13s}.suit.s4{animation-duration:10s}
   @keyframes floaty{from{translate:0 0}to{translate:0 -26px}}
 
+  /* ===== futuristic hero FX : perspective floor + floating cards & chips ===== */
+  .hero-grid{position:absolute;left:-10%;right:-10%;bottom:0;height:46vh;z-index:0;pointer-events:none;
+    background-image:linear-gradient(rgba(201,168,106,.18) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,106,.12) 1px,transparent 1px);
+    background-size:48px 48px;transform:perspective(420px) rotateX(64deg);transform-origin:bottom center;
+    mask:linear-gradient(to top,#000 6%,transparent 80%);-webkit-mask:linear-gradient(to top,#000 6%,transparent 80%);
+    opacity:0;transition:opacity 1.4s var(--ease) .3s;animation:gridpan 14s linear infinite}
+  .hero-fx.in ~ .hero-grid,.hero.in .hero-grid{opacity:.55}
+  @keyframes gridpan{from{background-position:0 0}to{background-position:0 48px}}
+  .hero-fx{position:absolute;inset:0;z-index:1;pointer-events:none}
+  .fcard{position:absolute;width:clamp(58px,9vw,98px);aspect-ratio:5/7;border-radius:12px;
+    background:linear-gradient(158deg,#f8f5ee,#e7e0cd);color:#14140f;
+    box-shadow:0 34px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.07);
+    display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;
+    font-family:'Playfair Display',serif;line-height:1;
+    opacity:0;scale:.7;transition:opacity 1s var(--ease),scale 1s var(--ease);
+    animation:floatA var(--fd,9s) ease-in-out infinite alternate;will-change:transform,translate}
+  .hero-fx.in .fcard{opacity:1;scale:1}
+  .fcard span{font-size:clamp(20px,3.4vw,34px);font-weight:800}
+  .fcard b{font-size:clamp(20px,3.4vw,34px)}
+  .fcard.red{color:#b3303a}
+  .fcard::before,.fcard::after{content:attr(data-c);position:absolute;font-size:11px;font-weight:700;font-family:'Playfair Display',serif}
+  .fcard::before{top:7px;left:9px}.fcard::after{bottom:7px;right:9px;transform:rotate(180deg)}
+  @keyframes floatA{from{transform:translateY(0) rotate(var(--r,0deg))}to{transform:translateY(-26px) rotate(var(--r2,0deg))}}
+  .chip{position:absolute;width:clamp(48px,8vw,80px);aspect-ratio:1;border-radius:50%;z-index:1;
+    background:radial-gradient(circle at 50% 34%,#33333b,#111114 70%);
+    border:3px dashed rgba(201,168,106,.55);box-shadow:0 22px 44px rgba(0,0,0,.55);
+    opacity:0;scale:.7;transition:opacity 1s var(--ease) .15s,scale 1s var(--ease) .15s;
+    animation:floatA var(--fd,11s) ease-in-out infinite alternate}
+  .chip::after{content:"";position:absolute;inset:9px;border-radius:50%;border:2px solid rgba(201,168,106,.32)}
+  .hero-fx.in .chip{opacity:.92;scale:1}
+  @media(max-width:640px){
+    .fcard{box-shadow:0 20px 38px rgba(0,0,0,.55)}
+    .hero-grid{height:38vh}
+  }
+
   /* ===== power-words lexicon band (Apple-style kinetic typography) ===== */
   .lexicon{position:relative;overflow:hidden;min-height:78vh;display:flex;align-items:center;justify-content:center;
     border-block:1px solid var(--line);
@@ -176,9 +211,9 @@
   .card .add{display:flex;align-items:center;justify-content:center;text-align:center;
     margin:2px 16px 16px;padding:15px 22px;border-radius:46px;
     background:var(--gold-bright);color:#000;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
-    opacity:0;transform:translateY(14px);
-    transition:opacity .6s var(--ease),transform .6s var(--ease),background .35s var(--ease),color .35s var(--ease),box-shadow .35s var(--ease)}
-  .card.in .add{opacity:1;transform:none;transition-delay:.28s}
+    opacity:0;transform:translateY(46px) scale(.92);
+    transition:opacity .7s var(--ease),transform .7s cubic-bezier(.16,1,.3,1),background .35s var(--ease),color .35s var(--ease),box-shadow .35s var(--ease)}
+  .card.in .add{opacity:1;transform:translateY(0) scale(1);transition-delay:.32s}
   .card .add:hover{background:transparent;color:var(--gold-bright);box-shadow:inset 0 0 0 1px var(--gold-bright)}
   .card .add:active{transform:scale(.97)}
 
@@ -324,7 +359,7 @@
     .hero{min-height:92vh;padding:110px 18px 90px}
     .hero p.sub{font-size:15px;margin-top:24px}
     .hero-cta{margin-top:34px;width:100%}
-    .hero-cta .btn{flex:1;text-align:center;padding:16px 14px}
+    .hero-cta .btn{flex:1;text-align:center;padding:16px 10px;font-size:10.5px;letter-spacing:.1em;white-space:nowrap}
     .scroll-cue{display:none}
     .marquee{padding:16px 0}
     .sec-head{margin-bottom:38px}
@@ -386,7 +421,16 @@
 <!-- HERO -->
 <section class="hero">
   <div class="hero-bg"></div>
-  <span class="suit s1">♠</span><span class="suit s2">♥</span><span class="suit s3">♦</span><span class="suit s4">♣</span>
+  <div class="hero-fx" id="heroFx" aria-hidden="true">
+    <div class="fcard" data-c="A♠" style="top:12%;left:4%;--r:-13deg;--r2:-9deg;--fd:9s" data-par="0.16" data-parx="-0.05"><span>A</span><b>♠</b></div>
+    <div class="fcard red" data-c="K♥" style="top:9%;right:5%;--r:13deg;--r2:8deg;--fd:11s" data-par="0.24" data-parx="0.06"><span>K</span><b>♥</b></div>
+    <div class="fcard" data-c="Q♣" style="bottom:5%;left:3%;--r:10deg;--r2:14deg;--fd:10s" data-par="0.12" data-parx="-0.04"><span>Q</span><b>♣</b></div>
+    <div class="fcard red" data-c="J♦" style="bottom:6%;right:3%;--r:-9deg;--r2:-4deg;--fd:12.5s" data-par="0.28" data-parx="0.05"><span>J</span><b>♦</b></div>
+    <div class="chip" style="top:45%;left:2%;--fd:12s" data-par="0.18" data-parx="-0.03"></div>
+    <div class="chip" style="top:30%;right:3%;--fd:9.5s" data-par="0.14" data-parx="0.04"></div>
+    <div class="chip" style="bottom:9%;right:22%;--fd:13s" data-par="0.26" data-parx="0.03"></div>
+  </div>
+  <div class="hero-grid"></div>
   <span class="eyebrow">Luxury Poker Apparel · No Limit</span>
   <h1>PLAY<br><span class="out">UNCAPPED</span></h1>
   <p class="sub">Worn at the table, the rail, and the World Series. Built for players who never cap their range — and never cap their ambition.</p>
@@ -414,16 +458,16 @@
 <!-- POWER WORDS / LEXICON -->
 <section class="lexicon" id="lexicon">
   <div class="lex-words">
-    <span class="g" data-par="0.06" style="--x:6%;--y:16%;--s:1.7;--o:.16;--dx:24px;--dy:-18px;--d:0">All In</span>
-    <span data-par="0.10" style="--x:74%;--y:12%;--s:1.3;--o:.10;--dx:-20px;--dy:20px;--d:1">No Limit</span>
-    <span class="o" data-par="0.04" style="--x:18%;--y:64%;--s:2.1;--o:.5;--dx:18px;--dy:-26px;--d:2">Bluff</span>
-    <span data-par="0.12" style="--x:80%;--y:60%;--s:1.1;--o:.09;--dx:-24px;--dy:-14px;--d:3">Cooler</span>
-    <span data-par="0.08" style="--x:42%;--y:8%;--s:1.0;--o:.08;--dx:14px;--dy:22px;--d:1.5">Run It Twice</span>
-    <span class="g" data-par="0.14" style="--x:62%;--y:78%;--s:1.2;--o:.14;--dx:-18px;--dy:-20px;--d:2.5">The Nuts</span>
-    <span data-par="0.05" style="--x:10%;--y:40%;--s:1.0;--o:.07;--dx:20px;--dy:16px;--d:0.5">Hero Call</span>
-    <span class="o" data-par="0.09" style="--x:70%;--y:36%;--s:1.5;--o:.4;--dx:-16px;--dy:18px;--d:3.5">River</span>
-    <span data-par="0.07" style="--x:32%;--y:84%;--s:1.0;--o:.08;--dx:22px;--dy:-16px;--d:2">Final Table</span>
-    <span data-par="0.11" style="--x:50%;--y:50%;--s:1.0;--o:.06;--dx:-20px;--dy:-22px;--d:1">Bink</span>
+    <span class="g" data-par="0.34" data-parx="-0.14" style="--x:6%;--y:16%;--s:1.7;--o:.16;--dx:24px;--dy:-18px;--d:0">All In</span>
+    <span data-par="0.46" data-parx="0.16" style="--x:74%;--y:12%;--s:1.3;--o:.10;--dx:-20px;--dy:20px;--d:1">No Limit</span>
+    <span class="o" data-par="0.22" data-parx="0.10" style="--x:18%;--y:64%;--s:2.1;--o:.5;--dx:18px;--dy:-26px;--d:2">Bluff</span>
+    <span data-par="0.40" data-parx="-0.12" style="--x:80%;--y:60%;--s:1.1;--o:.09;--dx:-24px;--dy:-14px;--d:3">Cooler</span>
+    <span data-par="0.30" data-parx="0.18" style="--x:42%;--y:8%;--s:1.0;--o:.08;--dx:14px;--dy:22px;--d:1.5">Run It Twice</span>
+    <span class="g" data-par="0.48" data-parx="-0.16" style="--x:62%;--y:78%;--s:1.2;--o:.14;--dx:-18px;--dy:-20px;--d:2.5">The Nuts</span>
+    <span data-par="0.26" data-parx="0.14" style="--x:10%;--y:40%;--s:1.0;--o:.07;--dx:20px;--dy:16px;--d:0.5">Hero Call</span>
+    <span class="o" data-par="0.38" data-parx="-0.18" style="--x:70%;--y:36%;--s:1.5;--o:.4;--dx:-16px;--dy:18px;--d:3.5">River</span>
+    <span data-par="0.32" data-parx="0.12" style="--x:32%;--y:84%;--s:1.0;--o:.08;--dx:22px;--dy:-16px;--d:2">Final Table</span>
+    <span data-par="0.44" data-parx="-0.10" style="--x:50%;--y:50%;--s:1.0;--o:.06;--dx:-20px;--dy:-22px;--d:1">Bink</span>
   </div>
   <div class="lex-center">
     <div class="label reveal">The Language of No Limit</div>
@@ -728,26 +772,35 @@ addEventListener('mousemove',e=>{
   document.querySelectorAll('.suit').forEach((s,i)=>{const f=(i+1)*8;s.style.transform=`translate(${x*f}px,${y*f}px)`;});
 });
 
-/* scroll parallax for floating power words (uses CSS `translate` so it composes with the drift `transform`) */
+/* deal the hero FX in on load */
+const heroFx=document.getElementById('heroFx');
+if(heroFx){requestAnimationFrame(()=>requestAnimationFrame(()=>heroFx.classList.add('in')));}
+
+/* SCROLL-DRIVEN parallax — works on phones (swipe = scroll). Moves elements on X and Y
+   by their position in the viewport, so words/cards drift around as you scroll. */
 const reduceMotion=matchMedia('(prefers-reduced-motion:reduce)').matches;
 const pars=[...document.querySelectorAll('[data-par]')];
 let parTick=false;
 function applyPar(){
-  const vh=innerHeight;
+  const vh=innerHeight||1;
   for(const el of pars){
     const r=el.getBoundingClientRect();
-    const off=(r.top+r.height/2)-vh/2;
+    const off=((r.top+r.height/2)-vh/2)/vh;      // -0.5..0.5+ normalized
     const sp=parseFloat(el.dataset.par)||0.06;
-    el.style.translate='0 '+(-(off*sp)).toFixed(1)+'px';
+    const spx=parseFloat(el.dataset.parx)||0;
+    const ty=-(off*sp*vh);                         // vertical drift
+    const tx=(off*spx*vh);                         // horizontal drift
+    el.style.translate=tx.toFixed(1)+'px '+ty.toFixed(1)+'px';
   }
   parTick=false;
 }
 if(!reduceMotion && pars.length){
   addEventListener('scroll',()=>{if(!parTick){parTick=true;requestAnimationFrame(applyPar);}},{passive:true});
+  addEventListener('resize',applyPar,{passive:true});
   applyPar();
 }
 
-/* lexicon words also drift subtly with the cursor for depth (desktop) */
+/* desktop bonus: lexicon words also drift with the cursor */
 if(!reduceMotion && matchMedia('(hover:hover)').matches){
   const lw=[...document.querySelectorAll('.lex-words span')];
   addEventListener('mousemove',e=>{
