@@ -699,37 +699,8 @@ addEventListener('scroll',()=>{
 const io=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){en.target.classList.add('in');io.unobserve(en.target);}});},{threshold:.16});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-/* ---------- products (placeholder — swap for Dan's designs) ---------- */
-const products=[
-  {name:'Degen',cat:'Heavyweight Tee · Onyx',price:'$68',img:'assets/degen-tee.webp',tag:'Best Seller'},
-  {name:'Bluff',cat:'Heavyweight Tee · Onyx',price:'$68',img:'assets/bluff-tee.webp',tag:'Flagship'},
-  {name:'Max Pain',cat:'Heavyweight Hoodie · Onyx',price:'$128',img:'assets/max-pain-hoodie.webp',tag:''},
-  {name:'Call.',cat:'Heavyweight Tee · Onyx',price:'$68',img:'assets/call-tee.webp',tag:'New'},
-  {name:'Table Captain',cat:'Heavyweight Tee · Onyx',price:'$68',img:'assets/table-captain-tee.webp',tag:''},
-  {name:'Nothin Funner',cat:'Heavyweight Tee · Onyx',price:'$72',img:'assets/nothin-funner-tee.webp',tag:'Limited'},
-  {name:'Limpin Ain’t Easy',cat:'Heavyweight Tee · Onyx',price:'$68',img:'assets/limpin-tee.webp',tag:''},
-  {name:'Once',cat:'Tonal Tee · Blackout',price:'$72',img:'assets/once-tee.webp',tag:'Blackout'},
-  {name:'No Backers',cat:'Tonal Tee · Blackout',price:'$72',img:'assets/no-backers-tee.webp',tag:'Blackout'},
-  {name:'Raise',cat:'Tonal Tee · Blackout',price:'$68',img:'assets/raise-tee.webp',tag:'Blackout'},
-  {name:'Pocket Aces',cat:'Tonal Tee · Blackout',price:'$68',img:'assets/pocket-aces-tee.webp',tag:''},
-  {name:'Degen Trucker',cat:'Headwear · Black/Gold',price:'$48',img:'assets/degen-trucker.webp',tag:''},
-  {name:'Bluff Trucker',cat:'Headwear · Black/Gold',price:'$48',img:'assets/bluff-trucker.webp',tag:''},
-  {name:'Nit Cap',cat:'Headwear · Onyx',price:'$44',img:'assets/nit-cap.webp',tag:''},
-];
-const grid=document.getElementById('productGrid');
-grid.innerHTML=products.map((p,i)=>`
-  <div class="card reveal ${i%3==1?'d1':i%3==2?'d2':''}">
-    <div class="ph">
-      ${p.tag?`<span class="tag">${p.tag}</span>`:''}
-      <img src="${p.img}" alt="${p.name} — Uncapped Poker" loading="lazy" width="900" height="900">
-    </div>
-    <div class="meta">
-      <div><h3>${p.name}</h3><div class="cat">${p.cat}</div></div>
-      <div class="price">${p.price}</div>
-    </div>
-    <div class="add" data-h>Add to Cart</div>
-  </div>`).join('');
-document.querySelectorAll('#productGrid .reveal').forEach(el=>io.observe(el));
+/* Product grid, cart, quick-add and product pages are rendered by store.js
+   (single source of truth: catalog.js · commerce config: shopify-config.js) */
 
 /* ---------- Beat the AI : Blackjack ---------- */
 const SUITS=[{s:'♠',c:0},{s:'♣',c:0},{s:'♥',c:1},{s:'♦',c:1}];
@@ -840,16 +811,8 @@ document.getElementById('newsBtn').addEventListener('click',()=>{
   const i=document.getElementById('newsEmail');
   if(i.value&&i.value.includes('@')){i.value='';document.getElementById('newsBtn').textContent='You\'re in';setTimeout(()=>document.getElementById('newsBtn').textContent='Join',1800);}
 });
-let cart=0;
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('add')){cart++;document.querySelector('.nav-cart').textContent='Cart · '+cart;e.target.textContent='Added ✓';setTimeout(()=>e.target.textContent='Add to Cart',1200);}
-});
-/* The True Gambler mystery box add-to-cart */
-document.getElementById('gamblerAdd')?.addEventListener('click',function(){
-  cart++;document.querySelector('.nav-cart').textContent='Cart · '+cart;
-  const o=this.textContent;this.textContent='Added to Cart ✓';this.disabled=true;
-  setTimeout(()=>{this.textContent=o;this.disabled=false;},1500);
-});
+/* Cart, Add-to-Cart, the mystery box button and the cart counter
+   are all handled by store.js (Shopify-ready commerce layer). */
 
 /* mobile menu toggle */
 const menuBtn=document.getElementById('menuBtn'),mNav=document.getElementById('mobileNav');
@@ -899,5 +862,10 @@ if(!reduceMotion && matchMedia('(hover:hover)').matches){
   },{passive:true});
 }
 </script>
+
+<!-- Shopify-ready commerce layer: catalog (data) → config (keys) → store (cart/PDP/checkout) -->
+<script src="catalog.js"></script>
+<script src="shopify-config.js"></script>
+<script src="store.js" defer></script>
 </body>
 </html>
