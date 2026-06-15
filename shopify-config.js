@@ -21,9 +21,9 @@
 window.UNCAPPED = window.UNCAPPED || {};
 
 window.UNCAPPED.shopify = {
-  live: false,                       // ← set true once the fields below are filled
-  domain: '',                        // e.g. 'uncapped-poker.myshopify.com'
-  storefrontToken: '',               // Storefront API public access token
+  live: false,                       // ← set true once the token below is filled + products are Active
+  domain: 'uncapped-poker.myshopify.com', // ✓ your store (preset)
+  storefrontToken: '',               // ← paste Storefront API public access token here (last step)
 
   // Optional: hard-code variant IDs per product handle + size.
   // If left empty AND live=true, store.js will look them up from Shopify by handle.

@@ -88,7 +88,7 @@ window.UNCAPPED.catalog = [
     upsell: ['degen', 'nit-cap', 'the-true-gambler'], variants: {}
   },
   {
-    handle: 'limpin', title: 'Limpin Ain’t Easy', type: 'shirt', category: 'Heavyweight Tee',
+    handle: 'limpin-aint-easy', title: 'Limpin Ain’t Easy', type: 'shirt', category: 'Heavyweight Tee',
     collection: 'Shirts', colorway: 'Onyx', price: 68, tag: '',
     image: 'assets/limpin-tee.webp', images: ['assets/limpin-tee.webp'], sizes: SHIRT_SIZES,
     blurb: 'A wink to the table for the ones who know.',
@@ -186,17 +186,23 @@ window.UNCAPPED.discounts = [
 
 /* Homepage shows these 8 (top sellers). "Shop All" reveals the full catalog.
    Reorder/swap handles here to change what's featured. */
+/* Launch lineup: hats first (the drop), then shirts teased as Coming Soon. */
 window.UNCAPPED.featured = [
-  'degen', 'bluff', 'max-pain', 'call',
-  'table-captain', 'nothin-funner', 'raise', 'degen-trucker'
+  'degen-trucker', 'bluff-trucker', 'nit-cap',
+  'degen', 'bluff', 'max-pain', 'call', 'table-captain'
 ];
 
-/* Fulfillment: no inventory on hand yet, so everything is order-to-print.
-   When Dan stocks a specific item, add `inStock: true` to that product above
-   (and turn on Shopify inventory tracking). Edit the wording here anytime. */
+/* Fulfillment states.
+   - Hats are the launch line: "Sold Out" but orderable for the next batch.
+   - Shirts + the box are "Coming Soon" (not yet orderable).
+   When shirts are ready: remove 'Shirts' (and/or 'Mystery Box') from
+   `comingSoonCollections` below — that's the only change needed.
+   Per-product override: add `status: 'next-batch'` or `status: 'coming-soon'`. */
 window.UNCAPPED.fulfillment = {
-  madeToOrder: true,
-  badge: 'Made to Order',
-  cta: 'Pre-Order',
-  note: 'Printed to order — ships in about 1–2 weeks.'
+  default: 'next-batch',
+  comingSoonCollections: ['Shirts', 'Mystery Box'],
+  states: {
+    'next-batch':  { badge: 'Sold Out',    cta: 'Order — Next Batch', note: 'Sold out — order now to claim your spot in the next batch.', orderable: true },
+    'coming-soon': { badge: 'Coming Soon',  cta: 'Coming Soon',        note: 'Dropping soon — join the list for first access.',            orderable: false }
+  }
 };
