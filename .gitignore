@@ -1,0 +1,14 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Node (for future headless Shopify front-end)
+node_modules/
+dist/
+.env
+.env.local
+*.log
