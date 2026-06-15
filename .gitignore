@@ -12,3 +12,6 @@ dist/
 .env
 .env.local
 *.log
+
+# build intermediates
+assets/_flat/
