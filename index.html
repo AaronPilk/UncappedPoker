@@ -194,6 +194,10 @@
   /* product grid */
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:clamp(14px,2.4vw,30px)}
   @media(max-width:560px){.grid{gap:12px}}
+  .felt-grid{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:640px){.felt-grid{grid-template-columns:repeat(2,1fr)}}
+  .felt-note{margin-top:26px;text-align:center;color:var(--ink-dim);font-size:13px;letter-spacing:.04em}
+  .felt-note b{color:var(--gold-bright)}
   .card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:.5s var(--ease)}
   .card:hover{transform:translateY(-8px);border-color:var(--gold)}
   .card .ph{aspect-ratio:4/5;position:relative;overflow:hidden;
@@ -408,8 +412,8 @@
     .card .add{margin:0 12px 12px;padding:14px 18px}
     .hero{min-height:92vh;padding:110px 18px 90px}
     .hero p.sub{font-size:15px;margin-top:24px}
-    .hero-cta{margin-top:34px;width:100%}
-    .hero-cta .btn{flex:1;text-align:center;padding:16px 10px;font-size:10.5px;letter-spacing:.1em;white-space:nowrap}
+    /* hero CTAs are redundant on mobile — the sticky bottom bar always shows them */
+    .hero-cta{display:none}
     .scroll-cue{display:none}
     .marquee{padding:16px 0}
     .sec-head{margin-bottom:38px}
@@ -631,12 +635,13 @@
     </div>
     <p class="reveal d2">From local card rooms to the World Series of Poker. Uncapped travels where the game is played.</p>
   </div>
-  <div class="grid" style="grid-template-columns:repeat(4,1fr)">
-    <div class="card reveal" style="grid-column:span 1"><div class="ph" style="aspect-ratio:1"><span class="mono">♠</span></div></div>
-    <div class="card reveal d1" style="grid-column:span 1"><div class="ph" style="aspect-ratio:1"><span class="mono">♥</span></div></div>
-    <div class="card reveal d2" style="grid-column:span 1"><div class="ph" style="aspect-ratio:1"><span class="mono">♦</span></div></div>
-    <div class="card reveal d3" style="grid-column:span 1"><div class="ph" style="aspect-ratio:1"><span class="mono">♣</span></div></div>
+  <div class="grid felt-grid">
+    <div class="card reveal"><div class="ph" style="aspect-ratio:1"><img src="assets/nothin-funner-tee.webp" alt="Nothin Funner — Uncapped" loading="lazy"></div></div>
+    <div class="card reveal d1"><div class="ph" style="aspect-ratio:1"><img src="assets/call-tee.webp" alt="Call. — Uncapped" loading="lazy"></div></div>
+    <div class="card reveal d2"><div class="ph" style="aspect-ratio:1"><img src="assets/max-pain-hoodie.webp" alt="Max Pain — Uncapped" loading="lazy"></div></div>
+    <div class="card reveal d3"><div class="ph" style="aspect-ratio:1"><img src="assets/bluff-tee.webp" alt="Bluff — Uncapped" loading="lazy"></div></div>
   </div>
+  <p class="felt-note reveal">More to come — tag <b>@uncapped</b> and you'll show up here.</p>
 </section>
 
 <!-- FOOTER -->
