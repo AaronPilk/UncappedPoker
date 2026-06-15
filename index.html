@@ -172,9 +172,15 @@
   .card .meta h3{font-size:18px;font-weight:600}
   .card .meta .cat{font-size:11px;color:var(--ink-dim);letter-spacing:.1em;text-transform:uppercase;margin-top:4px}
   .card .meta .price{font-family:'JetBrains Mono',monospace;color:var(--gold-bright);font-size:15px;white-space:nowrap}
-  .card .add{position:absolute;left:0;right:0;bottom:0;background:var(--gold-bright);color:#000;text-align:center;
-    padding:14px;font-size:11px;letter-spacing:.25em;text-transform:uppercase;transform:translateY(100%);transition:.45s var(--ease)}
-  .card:hover .add{transform:none}
+  /* modern rounded pill, reveals as the card scrolls into view */
+  .card .add{display:flex;align-items:center;justify-content:center;text-align:center;
+    margin:2px 16px 16px;padding:15px 22px;border-radius:46px;
+    background:var(--gold-bright);color:#000;font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    opacity:0;transform:translateY(14px);
+    transition:opacity .6s var(--ease),transform .6s var(--ease),background .35s var(--ease),color .35s var(--ease),box-shadow .35s var(--ease)}
+  .card.in .add{opacity:1;transform:none;transition-delay:.28s}
+  .card .add:hover{background:transparent;color:var(--gold-bright);box-shadow:inset 0 0 0 1px var(--gold-bright)}
+  .card .add:active{transform:scale(.97)}
 
   /* split editorial / story */
   .story{display:grid;grid-template-columns:1.1fr 1fr;gap:0;align-items:stretch;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--bg-2)}
@@ -240,10 +246,27 @@
   .code button{cursor:none;font-family:'Inter';font-size:10px;letter-spacing:.2em;text-transform:uppercase;background:var(--gold-bright);color:#000;border:none;padding:8px 12px;border-radius:7px}
   .btn-felt{background:var(--gold-bright);color:#000;border:1px solid var(--gold-bright);cursor:none}
   .btn-felt.ghost{background:transparent;color:var(--ink)}
-  .progress-dots{display:flex;gap:8px;justify-content:center;margin-bottom:8px}
-  .progress-dots i{width:9px;height:9px;border-radius:50%;border:1px solid var(--gold);display:inline-block}
-  .progress-dots i.win{background:var(--gold-bright);border-color:var(--gold-bright)}
-  .progress-dots i.loss{background:var(--crimson);border-color:var(--crimson)}
+  /* ----- blackjack table ----- */
+  .bj{display:flex;flex-direction:column;gap:14px;margin-bottom:8px}
+  .bj-seat .who{font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:rgba(244,240,230,.7);margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:10px}
+  .bj-seat .who .hval{font-family:'JetBrains Mono',monospace;letter-spacing:.1em;color:var(--gold-bright);
+    border:1px solid rgba(201,168,106,.4);border-radius:30px;padding:3px 11px;font-size:12px;min-width:34px}
+  .bj-divider{display:flex;align-items:center;justify-content:center;gap:14px;color:rgba(201,168,106,.6)}
+  .bj-divider::before,.bj-divider::after{content:"";height:1px;width:60px;background:rgba(201,168,106,.25)}
+  .bj-divider span{font-family:'Playfair Display',serif;font-style:italic;color:var(--gold-bright);font-size:20px}
+  .hand{display:flex;justify-content:center;align-items:center;gap:8px;min-height:150px;flex-wrap:wrap}
+  .bjcard{width:96px;height:138px;border-radius:11px;background:#f6f3ea;color:#111;position:relative;
+    box-shadow:0 14px 32px rgba(0,0,0,.5);font-family:'Playfair Display',serif;
+    animation:dealIn .42s var(--ease) both}
+  @keyframes dealIn{from{opacity:0;transform:translateY(-34px) rotate(-7deg)}to{opacity:1;transform:none}}
+  .bjcard.red{color:#b3303a}
+  .bjcard .c-mid{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:46px}
+  .bjcard .c-tl,.bjcard .c-br{position:absolute;font-size:15px;font-weight:700;line-height:.95;text-align:center}
+  .bjcard .c-tl{top:8px;left:9px}
+  .bjcard .c-br{bottom:8px;right:9px;transform:rotate(180deg)}
+  .bjcard.back{background:repeating-linear-gradient(45deg,#16382c 0 8px,#1c4a39 8px 16px);border:6px solid #f6f3ea}
+  .bjcard.back::after{content:"♠";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--gold-bright);font-size:40px}
+  @media(max-width:560px){.bjcard{width:74px;height:106px}.bjcard .c-mid{font-size:36px}.hand{min-height:118px;gap:6px}}
 
   /* newsletter / footer */
   footer{background:var(--bg-2);border-top:1px solid var(--line);padding:clamp(70px,9vw,120px) clamp(20px,5vw,60px) 40px}
@@ -296,10 +319,8 @@
     header{padding:16px 20px}
     header.scrolled{padding:12px 20px}
     .logo{font-size:19px;letter-spacing:.28em}
-    /* hover-only reveals must be visible/tappable on touch */
-    .card .add{position:static;transform:none;border-top:1px solid var(--line)}
     .card:active{transform:translateY(-4px);border-color:var(--gold)}
-    .card .ph .mono{font-size:54px}
+    .card .add{margin:0 12px 12px;padding:14px 18px}
     .hero{min-height:92vh;padding:110px 18px 90px}
     .hero p.sub{font-size:15px;margin-top:24px}
     .hero-cta{margin-top:34px;width:100%}
@@ -359,7 +380,7 @@
 
 <div class="mobile-cta">
   <a href="#shop" class="c1" data-h>Shop the Drop</a>
-  <a href="#beat" class="c2" data-h>Beat the AI · 15%</a>
+  <a href="#beat" class="c2" data-h>Beat the Dealer</a>
 </div>
 
 <!-- HERO -->
@@ -371,7 +392,7 @@
   <p class="sub">Worn at the table, the rail, and the World Series. Built for players who never cap their range — and never cap their ambition.</p>
   <div class="hero-cta">
     <a href="#shop" class="btn btn-primary" data-h>Shop the Drop</a>
-    <a href="#beat" class="btn btn-ghost" data-h>Beat the AI · Win 15%</a>
+    <a href="#beat" class="btn btn-ghost" data-h>Beat the Dealer</a>
   </div>
   <div class="scroll-cue"><span>Scroll</span><span class="line"></span></div>
 </section>
@@ -449,35 +470,30 @@
 <section class="block" id="beat">
   <div class="beat-wrap">
     <div class="label reveal">03 — The Challenge</div>
-    <h2 class="reveal d1">Beat the AI.<br>Win the discount.</h2>
-    <p class="lede reveal d2">High-card duel against The House. Win 2 of 3 rounds and we'll unlock a code for your first order. Lose, and... well, the house usually wins. Care to test that?</p>
+    <h2 class="reveal d1">Beat the dealer.<br>Unlock the discount.</h2>
+    <p class="lede reveal d2">One hand of blackjack against The House. Beat the dealer and we'll unlock a secret discount for your first order — you won't find out how good until checkout. Care to play?</p>
     <div class="felt reveal d2">
-      <div class="progress-dots" id="dots"><i></i><i></i><i></i></div>
-      <div class="duel">
-        <div class="seat">
-          <div class="who">You</div>
-          <div class="pcard" id="youCard"><div class="inner">
-            <div class="back"></div><div class="face black"><span class="rank">?</span></div>
-          </div></div>
-          <div class="score" id="youScore">Wins · 0</div>
+      <div class="bj">
+        <div class="bj-seat">
+          <div class="who">The House <span class="hval" id="dealerVal">—</span></div>
+          <div class="hand" id="dealerCards"></div>
         </div>
-        <div class="vs">vs</div>
-        <div class="seat">
-          <div class="who">The House AI</div>
-          <div class="pcard" id="aiCard"><div class="inner">
-            <div class="back"></div><div class="face black"><span class="rank">?</span></div>
-          </div></div>
-          <div class="score" id="aiScore">Wins · 0</div>
+        <div class="bj-divider"><span>vs</span></div>
+        <div class="bj-seat">
+          <div class="who">You <span class="hval" id="playerVal">—</span></div>
+          <div class="hand" id="playerCards"></div>
         </div>
       </div>
-      <div class="beat-status" id="beatStatus">Ante up. Draw a card and try to out-rank the house.</div>
+      <div class="beat-status" id="beatStatus">Take a seat. Deal a hand and try to beat the dealer without busting 21.</div>
       <div class="beat-controls">
-        <button class="btn btn-felt" id="drawBtn" data-h>Draw Card</button>
-        <button class="btn btn-felt ghost" id="resetBtn" data-h style="display:none">New Game</button>
+        <button class="btn btn-felt" id="dealBtn" data-h>Deal Hand</button>
+        <button class="btn btn-felt" id="hitBtn" data-h style="display:none">Hit</button>
+        <button class="btn btn-felt ghost" id="standBtn" data-h style="display:none">Stand</button>
+        <button class="btn btn-felt ghost" id="resetBtn" data-h style="display:none">New Hand</button>
       </div>
       <div class="reward" id="reward">
-        <p style="color:var(--ink-dim);font-size:13px;margin-bottom:12px;letter-spacing:.05em">Your reward — applied at checkout:</p>
-        <div class="code"><span id="codeText">UNCAPPED15</span><button id="copyBtn" data-h>Copy</button></div>
+        <p style="color:var(--ink-dim);font-size:13px;margin-bottom:12px;letter-spacing:.05em">Your secret discount — applied at checkout:</p>
+        <div class="code"><span id="codeText">HOUSEMONEY</span><button id="copyBtn" data-h>Copy</button></div>
       </div>
     </div>
   </div>
@@ -587,71 +603,87 @@ grid.innerHTML=products.map((p,i)=>`
   </div>`).join('');
 document.querySelectorAll('#productGrid .reveal').forEach(el=>io.observe(el));
 
-/* ---------- Beat the AI : High-Card Duel ---------- */
-const ranks=[{r:'2',v:2},{r:'3',v:3},{r:'4',v:4},{r:'5',v:5},{r:'6',v:6},{r:'7',v:7},{r:'8',v:8},{r:'9',v:9},{r:'10',v:10},{r:'J',v:11},{r:'Q',v:12},{r:'K',v:13},{r:'A',v:14}];
-const suits=[{s:'♠',c:'black'},{s:'♣',c:'black'},{s:'♥',c:'red'},{s:'♦',c:'red'}];
-let round=0,youW=0,aiW=0,over=false;
-const youCard=document.getElementById('youCard'),aiCard=document.getElementById('aiCard');
-const drawBtn=document.getElementById('drawBtn'),resetBtn=document.getElementById('resetBtn');
-const statusEl=document.getElementById('beatStatus'),youScore=document.getElementById('youScore'),aiScore=document.getElementById('aiScore');
-const reward=document.getElementById('reward'),codeText=document.getElementById('codeText'),dots=document.getElementById('dots').children;
+/* ---------- Beat the AI : Blackjack ---------- */
+const SUITS=[{s:'♠',c:0},{s:'♣',c:0},{s:'♥',c:1},{s:'♦',c:1}];
+const RANKS=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+function cardVal(r){return r==='A'?11:(['J','Q','K','10'].includes(r)?10:parseInt(r));}
+let deck=[],player=[],dealer=[],bjOver=false;
+const dealerCards=document.getElementById('dealerCards'),playerCards=document.getElementById('playerCards');
+const dealerVal=document.getElementById('dealerVal'),playerVal=document.getElementById('playerVal');
+const statusEl=document.getElementById('beatStatus');
+const dealBtn=document.getElementById('dealBtn'),hitBtn=document.getElementById('hitBtn'),standBtn=document.getElementById('standBtn'),resetBtn=document.getElementById('resetBtn');
+const reward=document.getElementById('reward'),codeText=document.getElementById('codeText');
 
-function rnd(a){return a[Math.floor(Math.random()*a.length)]}
-function paint(card,rank,suit){
-  const face=card.querySelector('.face');
-  face.className='face '+suit.c;
-  face.innerHTML=`<span class="corner">${rank.r}<br>${suit.s}</span><span class="rank">${rank.r}</span><span class="suit-s">${suit.s}</span><span class="corner br">${rank.r}<br>${suit.s}</span>`;
+function newDeck(){deck=[];for(const su of SUITS)for(const r of RANKS)deck.push({r,s:su.s,c:su.c});
+  for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}}
+function handTotal(h){let t=0,a=0;for(const c of h){t+=cardVal(c.r);if(c.r==='A')a++;}while(t>21&&a>0){t-=10;a--;}return t;}
+function cardEl(c,hidden){const d=document.createElement('div');
+  if(hidden){d.className='bjcard back';return d;}
+  d.className='bjcard'+(c.c?' red':'');
+  d.innerHTML=`<span class="c-tl">${c.r}<br>${c.s}</span><span class="c-mid">${c.s}</span><span class="c-br">${c.r}<br>${c.s}</span>`;
+  return d;}
+function render(hideHole){
+  playerCards.innerHTML='';player.forEach(c=>playerCards.appendChild(cardEl(c,false)));
+  dealerCards.innerHTML='';dealer.forEach((c,i)=>dealerCards.appendChild(cardEl(c,hideHole&&i===1)));
+  playerVal.textContent=player.length?handTotal(player):'—';
+  dealerVal.textContent=hideHole?'?':(dealer.length?handTotal(dealer):'—');
 }
-function setFlip(card,on){card.classList.toggle('flip',on)}
-
-function draw(){
-  if(over) return;
-  drawBtn.disabled=true;
-  // reset flips
-  setFlip(youCard,false);setFlip(aiCard,false);
-  const yR=rnd(ranks),yS=rnd(suits);
-  let aR=rnd(ranks),aS=rnd(suits);
-  // slight skill flavor: re-roll one obvious tie to keep it lively
-  paint(youCard,yR,yS);paint(aiCard,aR,aS);
-  statusEl.innerHTML='Cards in the muck... revealing.';
-  setTimeout(()=>setFlip(youCard,true),250);
-  setTimeout(()=>setFlip(aiCard,true),650);
-  setTimeout(()=>{
-    round++;
-    if(yR.v>aR.v){youW++;statusEl.innerHTML=`<b>You take it</b> — ${yR.r} over ${aR.r}.`;}
-    else if(yR.v<aR.v){aiW++;statusEl.innerHTML=`House wins the round — ${aR.r} over ${yR.r}.`;}
-    else{statusEl.innerHTML=`Split pot — ${yR.r} each. No round scored.`;round--;}
-    youScore.textContent='Wins · '+youW;aiScore.textContent='Wins · '+aiW;
-    // dots
-    [...dots].forEach((d,i)=>{d.className=''});
-    let di=0;for(let i=0;i<youW;i++){dots[di++].classList.add('win')}for(let i=0;i<aiW;i++){dots[di++].classList.add('loss')}
-    // decide
-    if(youW===2||aiW===2){
-      over=true;drawBtn.style.display='none';resetBtn.style.display='inline-block';
-      if(youW===2){
-        statusEl.innerHTML='<b>You beat the House.</b> Range stays uncapped — here\'s your reward.';
-        codeText.textContent='UNCAPPED15';reward.classList.add('show');
-        confetti();
-      }else{
-        statusEl.innerHTML='The House takes it this time. Take a consolation — <b>5% off</b> and run it back.';
-        codeText.textContent='RUNITBACK5';reward.classList.add('show');
-      }
-    }else{
-      drawBtn.disabled=false;
-    }
-  },1250);
+function setCtl(deal,play){
+  dealBtn.style.display=deal?'inline-flex':'none';
+  hitBtn.style.display=play?'inline-flex':'none';
+  standBtn.style.display=play?'inline-flex':'none';
+  resetBtn.style.display=(!deal&&!play)?'inline-flex':'none';}
+function deal(){
+  newDeck();player=[deck.pop(),deck.pop()];dealer=[deck.pop(),deck.pop()];bjOver=false;
+  reward.classList.remove('show');render(true);
+  statusEl.innerHTML='Your move — <b>Hit</b> to draw, <b>Stand</b> to hold.';
+  setCtl(false,true);
+  if(handTotal(player)===21)stand(true);
 }
-function reset(){
-  round=0;youW=0;aiW=0;over=false;
-  youScore.textContent='Wins · 0';aiScore.textContent='Wins · 0';
-  setFlip(youCard,false);setFlip(aiCard,false);
-  reward.classList.remove('show');
-  drawBtn.style.display='inline-block';drawBtn.disabled=false;resetBtn.style.display='none';
-  [...dots].forEach(d=>d.className='');
-  statusEl.innerHTML='Ante up. Draw a card and try to out-rank the house.';
+function hit(){
+  if(bjOver)return;player.push(deck.pop());render(true);
+  const t=handTotal(player);
+  if(t>21){render(false);finish('bust');}
+  else if(t===21)stand();
+  else statusEl.innerHTML='You\'re showing '+t+'. Hit or stand?';
 }
-drawBtn.addEventListener('click',draw);
-resetBtn.addEventListener('click',reset);
+function stand(natural){
+  if(bjOver)return;setCtl(false,false);render(false);
+  statusEl.innerHTML='The House reveals...';
+  const step=()=>{
+    if(handTotal(dealer)<17){dealer.push(deck.pop());render(false);statusEl.innerHTML='The House draws...';setTimeout(step,650);}
+    else decide(natural);
+  };
+  setTimeout(step,650);
+}
+function decide(natural){
+  const p=handTotal(player),d=handTotal(dealer);
+  if(d>21||p>d)finish('win',natural);
+  else if(p===d)finish('push');
+  else finish('lose');
+}
+function finish(kind,natural){
+  bjOver=true;setCtl(false,false);
+  if(kind==='win'){
+    statusEl.innerHTML=natural?'<b>Blackjack!</b> You beat the House — your secret discount is unlocked.':'<b>You beat the House.</b> Your secret discount is unlocked.';
+    codeText.textContent='HOUSEMONEY';reward.classList.add('show');confetti();
+  }else if(kind==='push'){
+    statusEl.innerHTML='Push — you tied the House. Run it back?';
+  }else if(kind==='bust'){
+    statusEl.innerHTML='Busted. The House takes it — but here\'s a little something to run it back.';
+    codeText.textContent='RAILBIRD';reward.classList.add('show');
+  }else{
+    statusEl.innerHTML='The House edges it — take a consolation and run it back.';
+    codeText.textContent='RAILBIRD';reward.classList.add('show');
+  }
+}
+function resetBJ(){player=[];dealer=[];bjOver=false;reward.classList.remove('show');
+  playerCards.innerHTML='';dealerCards.innerHTML='';playerVal.textContent='—';dealerVal.textContent='—';
+  statusEl.innerHTML='Take a seat. Deal a hand and try to beat the dealer without busting 21.';setCtl(true,false);}
+dealBtn.addEventListener('click',deal);
+hitBtn.addEventListener('click',hit);
+standBtn.addEventListener('click',()=>stand());
+resetBtn.addEventListener('click',resetBJ);
 
 /* copy code */
 document.getElementById('copyBtn').addEventListener('click',function(){
