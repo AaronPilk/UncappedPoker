@@ -11,6 +11,9 @@
   var CFG = (window.UNCAPPED && window.UNCAPPED.shopify) || { live: false };
   var ALL = BOX ? CAT.concat([BOX]) : CAT.slice();
   var byHandle = {}; ALL.forEach(function (p) { byHandle[p.handle] = p; });
+  var FUL = (window.UNCAPPED && window.UNCAPPED.fulfillment) || { madeToOrder: false };
+  var FEAT = (window.UNCAPPED && window.UNCAPPED.featured) || CAT.slice(0, 8).map(function (p) { return p.handle; });
+  function mto(p) { return !!(FUL.madeToOrder && !p.inStock); }
 
   var money = function (n) { return '$' + (Number(n) % 1 === 0 ? Number(n).toFixed(0) : Number(n).toFixed(2)); };
   var el = function (tag, cls, html) { var e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; };
@@ -97,6 +100,28 @@
     box-shadow:0 14px 30px rgba(0,0,0,.5);font-size:11px;font-weight:700;letter-spacing:.04em}
   .uc-fab .b{position:absolute;top:-4px;right:-4px;background:var(--crimson);color:#fff;border-radius:50%;min-width:20px;height:20px;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 5px}
   @media(max-width:860px){.uc-fab{display:flex}}
+  /* made-to-order badge */
+  .uc-mto{position:absolute;bottom:12px;left:12px;z-index:2;font-size:9px;letter-spacing:.18em;text-transform:uppercase;
+    color:var(--ink);background:rgba(8,9,10,.72);border:1px solid var(--line);padding:6px 11px;border-radius:30px;backdrop-filter:blur(4px)}
+  .uc-ship{font-size:12px;color:var(--ink-dim);margin-top:12px;display:flex;align-items:center;gap:8px;letter-spacing:.02em}
+  .uc-ship::before{content:"●";color:var(--gold-bright);font-size:8px}
+  /* shop all cta */
+  .uc-shopall-cta{display:flex;justify-content:center;margin-top:clamp(34px,5vw,54px)}
+  .uc-shopall-btn{background:none;border:1px solid var(--gold);color:var(--gold-bright);cursor:pointer;
+    padding:17px 40px;border-radius:46px;font-size:12px;letter-spacing:.22em;text-transform:uppercase;transition:.35s var(--ease)}
+  .uc-shopall-btn:hover{background:var(--gold-bright);color:#000;border-color:var(--gold-bright)}
+  /* shop all overlay */
+  .uc-modal.shopall{align-items:flex-start;overflow-y:auto;background:var(--bg)}
+  .uc-sa-wrap{max-width:1200px;width:100%;margin:0 auto;padding:84px 22px 80px}
+  .uc-sa-head{text-align:center;margin-bottom:40px}
+  .uc-sa-head .lbl{font-size:11px;letter-spacing:.4em;text-transform:uppercase;color:var(--gold)}
+  .uc-sa-head h2{font-family:'Playfair Display',serif;font-size:clamp(38px,6vw,72px);margin-top:10px}
+  .uc-sa-group{margin-top:46px}
+  .uc-sa-group > .g-title{font-family:'Playfair Display',serif;font-size:clamp(22px,3vw,32px);margin-bottom:20px;display:flex;align-items:baseline;gap:12px}
+  .uc-sa-group > .g-title span{font-size:12px;color:var(--ink-dim);font-family:'Inter',sans-serif;letter-spacing:.1em}
+  .uc-sa-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:clamp(12px,2vw,24px)}
+  @media(max-width:900px){.uc-sa-grid{grid-template-columns:repeat(2,1fr)}}
+  body.uc-shopall .uc-modal.shopall{opacity:1;pointer-events:auto}
   `;
   document.head.appendChild(el('style', null, css));
 
@@ -115,13 +140,14 @@
     '</aside>' +
     '<div class="uc-modal qa"><div class="uc-card" id="ucQa"></div></div>' +
     '<div class="uc-modal pdp"><button class="uc-back" data-uc-close>← Back</button><div id="ucPdp"></div></div>' +
+    '<div class="uc-modal shopall"><button class="uc-back" data-uc-close>← Back</button><div id="ucShopAll"></div></div>' +
     '<button class="uc-fab" id="ucFab" aria-label="Open cart">BAG<span class="b" id="ucFabB">0</span></button>';
   document.body.appendChild(root);
 
   var $items = document.getElementById('ucItems'), $sub = document.getElementById('ucSub'),
       $demo = document.getElementById('ucDemo'), $qa = document.getElementById('ucQa'),
       $pdp = document.getElementById('ucPdp'), $fab = document.getElementById('ucFab'),
-      $fabB = document.getElementById('ucFabB');
+      $fabB = document.getElementById('ucFabB'), $shopAll = document.getElementById('ucShopAll');
 
   /* ---------------- cart state ---------------- */
   var cart = [];
@@ -140,7 +166,11 @@
 
   /* ---------------- open/close ---------------- */
   function openCart() { document.body.classList.add('uc-open', 'uc-cart'); }
-  function closeAll() { document.body.classList.remove('uc-open', 'uc-cart', 'uc-qa'); if (location.hash.indexOf('#product/') === 0) history.replaceState(null, '', location.pathname); document.body.classList.remove('uc-pdp'); }
+  function closeAll() {
+    document.body.classList.remove('uc-open', 'uc-cart', 'uc-qa', 'uc-pdp', 'uc-shopall');
+    var h = location.hash;
+    if (h.indexOf('#product/') === 0 || h === '#shop-all') history.replaceState(null, '', location.pathname);
+  }
   document.addEventListener('click', function (e) { if (e.target.closest('[data-uc-close]')) { e.preventDefault(); closeAll(); } });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
 
@@ -152,15 +182,25 @@
   function card(p) {
     return '<div class="card reveal" data-handle="' + p.handle + '">' +
       '<div class="ph">' + (p.tag ? '<span class="tag">' + p.tag + '</span>' : '') +
+        (mto(p) ? '<span class="uc-mto">' + FUL.badge + '</span>' : '') +
         '<img src="' + p.image + '" alt="' + p.title + ' — Uncapped Poker" loading="lazy" width="900" height="1080"></div>' +
       '<div class="meta"><div><h3>' + p.title + '</h3><div class="cat">' + p.category + ' · ' + p.colorway + '</div></div>' +
         '<div class="price">' + money(p.price) + '</div></div>' +
-      '<div class="add" data-h data-add="' + p.handle + '">Add to Cart</div></div>';
+      '<div class="add" data-h data-add="' + p.handle + '">' + (mto(p) ? FUL.cta : 'Add to Cart') + '</div></div>';
   }
   var grid = document.getElementById('productGrid');
   if (grid) {
-    grid.innerHTML = CAT.map(card).join('');
+    var featured = FEAT.map(function (h) { return byHandle[h]; }).filter(Boolean);
+    grid.innerHTML = featured.map(card).join('');
     grid.querySelectorAll('.card').forEach(function (c) { io ? io.observe(c) : c.classList.add('in'); });
+    // "Shop All" CTA under the featured grid
+    var shopSec = grid.parentElement;
+    if (shopSec && !document.getElementById('ucShopAllBtn')) {
+      var wrap = el('div', 'uc-shopall-cta');
+      wrap.innerHTML = '<button id="ucShopAllBtn" class="uc-shopall-btn" data-h>Shop All ' + (CAT.length) + ' Designs →</button>';
+      shopSec.appendChild(wrap);
+      document.getElementById('ucShopAllBtn').addEventListener('click', function () { location.hash = '#shop-all'; });
+    }
   }
 
   /* card clicks: image/title → PDP, Add → quick-add (or direct for hats) */
@@ -191,8 +231,9 @@
       '<h3>' + p.title + '</h3>' +
       '<div class="qa-price">' + money(p.price) + '</div>' +
       '<div class="uc-sizes">' + p.sizes.map(function (s) { return '<button class="uc-size" data-size="' + s + '">' + s + '</button>'; }).join('') + '</div>' +
-      '<button class="uc-add" id="ucQaAdd">Add to Bag</button>' +
-      '<div class="uc-hint" id="ucQaHint"></div>';
+      '<button class="uc-add" id="ucQaAdd">' + (mto(p) ? FUL.cta : 'Add to Bag') + '</button>' +
+      '<div class="uc-hint" id="ucQaHint"></div>' +
+      (mto(p) ? '<div class="uc-ship">' + FUL.note + '</div>' : '');
     $qa.querySelectorAll('.uc-size').forEach(function (b) {
       b.addEventListener('click', function () {
         $qa.querySelectorAll('.uc-size').forEach(function (x) { x.classList.remove('sel'); });
@@ -220,8 +261,9 @@
           '<div class="qa-price">' + money(p.price) + '</div>' +
           '<p class="desc">' + p.description + '</p>' +
           '<div class="uc-sizes" id="ucPdpSizes">' + p.sizes.map(function (s) { return '<button class="uc-size" data-size="' + s + '">' + s + '</button>'; }).join('') + '</div>' +
-          '<button class="uc-add" id="ucPdpAdd">Add to Bag — ' + money(p.price) + '</button>' +
+          '<button class="uc-add" id="ucPdpAdd">' + (mto(p) ? FUL.cta : 'Add to Bag') + ' — ' + money(p.price) + '</button>' +
           '<div class="uc-hint" id="ucPdpHint"></div>' +
+          (mto(p) ? '<div class="uc-ship">' + FUL.note + '</div>' : '') +
           '<div class="fabric">' + p.fabric + '</div>' +
         '</div>' +
       '</div></div>' +
@@ -245,15 +287,30 @@
     document.body.classList.add('uc-pdp');
     $pdp.parentElement.scrollTop = 0;
   }
-  function routePDP() {
-    if (location.hash.indexOf('#product/') === 0) {
-      var h = decodeURIComponent(location.hash.replace('#product/', ''));
-      if (byHandle[h]) { document.body.classList.add('uc-open'); renderPDP(h); return; }
+  function openShopAll() {
+    var cols = (window.UNCAPPED && window.UNCAPPED.collections) || ['Shirts', 'Hats', 'Mystery Box'];
+    var groups = cols.map(function (coll) {
+      var items = ALL.filter(function (p) { return p.collection === coll; });
+      if (!items.length) return '';
+      return '<div class="uc-sa-group"><div class="g-title">' + coll + ' <span>' + items.length + '</span></div>' +
+        '<div class="uc-sa-grid">' + items.map(card).join('') + '</div></div>';
+    }).join('');
+    $shopAll.innerHTML = '<div class="uc-sa-wrap"><div class="uc-sa-head"><div class="lbl">The Full Spread</div><h2>Every Design</h2></div>' + groups + '</div>';
+    $shopAll.querySelectorAll('.card').forEach(function (c) { c.classList.add('in'); }); // not scroll-observed here
+    document.body.classList.add('uc-open', 'uc-shopall');
+    $shopAll.parentElement.scrollTop = 0;
+  }
+  function route() {
+    var h = location.hash;
+    if (h.indexOf('#product/') === 0) {
+      var hd = decodeURIComponent(h.replace('#product/', ''));
+      if (byHandle[hd]) { document.body.classList.remove('uc-shopall'); document.body.classList.add('uc-open'); renderPDP(hd); return; }
     }
-    document.body.classList.remove('uc-pdp');
+    if (h === '#shop-all') { document.body.classList.remove('uc-pdp'); openShopAll(); return; }
+    document.body.classList.remove('uc-pdp', 'uc-shopall');
     if (!document.body.classList.contains('uc-cart') && !document.body.classList.contains('uc-qa')) document.body.classList.remove('uc-open');
   }
-  window.addEventListener('hashchange', routePDP);
+  window.addEventListener('hashchange', route);
 
   /* ---------------- cart render + checkout ---------------- */
   function renderCart() {
@@ -336,5 +393,5 @@
   }
 
   /* ---------------- init ---------------- */
-  renderCart(); syncCount(); routePDP();
+  renderCart(); syncCount(); route();
 })();

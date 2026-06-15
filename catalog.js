@@ -183,3 +183,20 @@ window.UNCAPPED.discounts = [
   { code: 'HOUSEMONEY', when: 'Awarded when the player beats the dealer at blackjack', suggested: '15% off first order' },
   { code: 'RAILBIRD',   when: 'Consolation when the player loses/busts',              suggested: '10% off first order' }
 ];
+
+/* Homepage shows these 8 (top sellers). "Shop All" reveals the full catalog.
+   Reorder/swap handles here to change what's featured. */
+window.UNCAPPED.featured = [
+  'degen', 'bluff', 'max-pain', 'call',
+  'table-captain', 'nothin-funner', 'raise', 'degen-trucker'
+];
+
+/* Fulfillment: no inventory on hand yet, so everything is order-to-print.
+   When Dan stocks a specific item, add `inStock: true` to that product above
+   (and turn on Shopify inventory tracking). Edit the wording here anytime. */
+window.UNCAPPED.fulfillment = {
+  madeToOrder: true,
+  badge: 'Made to Order',
+  cta: 'Pre-Order',
+  note: 'Printed to order — ships in about 1–2 weeks.'
+};
