@@ -81,7 +81,23 @@ The Beat-the-Dealer blackjack game hands out codes (the % is intentionally hidde
 
 Set them to "first order only" / one-time use as you prefer. Buyers enter the code on Shopify's checkout page.
 
-## Step 6 — Ship it
+## Step 6 — Brand the checkout (match the site)
+The whole site is your custom design; the **only** Shopify-styled screen is the final payment page. Brand it so it feels like Uncapped:
+
+Shopify admin → **Settings → Checkout → Customize** (opens the checkout & branding editor). Set:
+
+- **Logo:** upload the Uncapped wordmark/emblem; left or centered.
+- **Background:** dark — `#08090a` (main) / `#0e0f11` (panels).
+- **Primary / accent + buttons:** gold — `#e7c873` (bright) with `#c9a86a` as the secondary gold.
+- **Body text:** off-white `#f4f0e6`; muted text `#9a958a`.
+- **Error/sale accent (optional):** crimson `#b3303a`.
+- **Typography:** a clean sans for body; if available, a serif (Playfair-style) for headings to echo the site.
+
+Also worth branding while you're there: **Settings → Notifications** (order/shipping emails — add logo + colors) and the **Order status page**.
+
+> Exact brand hex (from the site's `--` variables): bg `#08090a`, panel `#0e0f11`, ink `#f4f0e6`, muted `#9a958a`, gold `#c9a86a`, gold-bright `#e7c873`, crimson `#b3303a`.
+
+## Step 7 — Ship it
 Commit and push. Cloudflare auto-deploys. `uncappedpoker.com` now takes real orders.
 
 ```

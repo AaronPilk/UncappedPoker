@@ -5,6 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>UNCAPPED — Luxury Poker Apparel</title>
 <meta name="description" content="Uncapped. Luxury poker apparel built for those who play with no limit. Worn at the table, the rail, and the World Series." />
+<link rel="canonical" href="https://uncappedpoker.com/" />
+<meta name="theme-color" content="#08090a" />
+<!-- Open Graph / social share -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Uncapped Poker" />
+<meta property="og:title" content="UNCAPPED — Luxury Poker Apparel" />
+<meta property="og:description" content="Built dark, finished in gold. Luxury poker apparel for players who never cap their range — at the table, the rail, and the World Series." />
+<meta property="og:url" content="https://uncappedpoker.com/" />
+<meta property="og:image" content="https://uncappedpoker.com/assets/og-image.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="UNCAPPED — Luxury Poker Apparel" />
+<meta name="twitter:description" content="Built dark, finished in gold. Luxury poker apparel — play with no limit." />
+<meta name="twitter:image" content="https://uncappedpoker.com/assets/og-image.jpg" />
+<!-- favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<!-- config + Meta Pixel (fires only when an ID is set in site-config.js) -->
+<script src="site-config.js"></script>
+<script>
+(function(){var s=(window.UNCAPPED&&window.UNCAPPED.site)||{};var id=s.metaPixelId||'';
+  window.ucTrack=function(ev,data){try{if(window.fbq)fbq('track',ev,data||{});}catch(e){}};
+  if(!id)return;
+  !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+  fbq('init',id);fbq('track','PageView');
+})();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,800;1,500&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
@@ -815,8 +844,14 @@ function confetti(){
 
 /* newsletter + simple cart count flair */
 document.getElementById('newsBtn').addEventListener('click',()=>{
-  const i=document.getElementById('newsEmail');
-  if(i.value&&i.value.includes('@')){i.value='';document.getElementById('newsBtn').textContent='You\'re in';setTimeout(()=>document.getElementById('newsBtn').textContent='Join',1800);}
+  const i=document.getElementById('newsEmail'),b=document.getElementById('newsBtn');
+  const email=(i.value||'').trim();
+  if(!email||!email.includes('@')){i.focus();return;}
+  const ep=(window.UNCAPPED&&window.UNCAPPED.site&&window.UNCAPPED.site.waitlistEndpoint)||'';
+  b.disabled=true;const o=b.textContent;b.textContent='…';
+  const done=()=>{i.value='';b.disabled=false;b.textContent='You\'re in ✓';if(window.ucTrack)ucTrack('Lead');setTimeout(()=>b.textContent=o||'Join',2400);};
+  if(ep){fetch(ep,{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({email:email,source:'uncappedpoker.com'})}).then(done).catch(done);}
+  else{done();}
 });
 /* Cart, Add-to-Cart, the mystery box button and the cart counter
    are all handled by store.js (Shopify-ready commerce layer). */

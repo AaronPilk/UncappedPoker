@@ -193,6 +193,8 @@
     var line = cart.filter(function (i) { return i.handle === handle && i.size === size; })[0];
     if (line) line.qty += qty; else cart.push({ handle: handle, size: size, qty: qty });
     save(); renderCart(); syncCount(); openCart();
+    var pp = byHandle[handle];
+    if (window.ucTrack && pp) ucTrack('AddToCart', { content_name: pp.title, content_ids: [handle], content_type: 'product', value: pp.price, currency: 'USD' });
   }
   function setQty(idx, q) { if (q <= 0) cart.splice(idx, 1); else cart[idx].qty = q; save(); renderCart(); syncCount(); }
 
@@ -329,6 +331,7 @@
     });
     document.body.classList.add('uc-pdp');
     $pdp.parentElement.scrollTop = 0;
+    if (window.ucTrack) ucTrack('ViewContent', { content_name: p.title, content_ids: [p.handle], content_type: 'product', value: p.price, currency: 'USD' });
   }
   var saFilter = 'All', saSort = 'featured';
   function shopProducts() {
@@ -425,6 +428,7 @@
   /* checkout */
   document.getElementById('ucCheckout').addEventListener('click', function () {
     if (!cart.length) return;
+    if (window.ucTrack) ucTrack('InitiateCheckout', { value: subtotal(), currency: 'USD', num_items: count() });
     if (CFG.live && CFG.domain && CFG.storefrontToken) { liveCheckout(this); }
     else { $demo.textContent = 'Secure checkout opens once Shopify payments are live.'; setTimeout(function () { $demo.textContent = ''; }, 3500); }
   });
